@@ -474,7 +474,9 @@ function withAcc(n, lv) {
   if (!lv.accidentals || Math.random() > 0.35) return { ...n, acc: 0 };
   const l = n.di % 7;
   const canSharp = [0, 1, 3, 4, 5].includes(l), canFlat = [1, 2, 4, 5, 6].includes(l);
-  const opts = [canSharp && 1, canFlat && -1].filter(Boolean);
+  // 鍵盤の外に出る♯♭(高いドの♯など)は出さない
+  const inKb = a => { const m = midiOf({ ...n, acc: a }); return m >= lv.kb[0] && m <= lv.kb[1]; };
+  const opts = [canSharp && 1, canFlat && -1].filter(a => a && inKb(a));
   return { ...n, acc: opts.length ? pick(opts) : 0 };
 }
 function makeRhythm(lv) {
